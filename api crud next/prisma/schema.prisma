@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Article {
+  id          Int      @id @default(autoincrement())
+  title       String   @unique
+  description String?
+  body        String
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model user {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model dadosPessoais {
+  id                Int                @id @default(autoincrement())
+  name              String
+  dateOfBirth       DateTime
+  age               Int
+  gender            String
+  cpf               String              @unique
+  phone             String
+  email             String
+  nationality       String
+  maritalStatus     String
+  dadosResidenciais dadosResidenciais?
+  emergencia        emergencia?
+}
+
+model dadosResidenciais {
+  address       String
+  street        String
+  number        String
+  complement    String?
+  neighborhood  String
+  city          String
+  state         String
+  postalCode    String
+  country       String
+  cpf           String        @id
+  dadosPessoais dadosPessoais @relation(fields: [cpf], references: [cpf])
+}
+
+model dadosAcademicos {
+  registrationNumber String @unique
+  course             String
+  yearOfEntry        Int
+  currentSemester    Int
+  academicStatus     String
+  gpa                Float?
+  educationMode      String
+}
+
+model emergencia {
+  name          String
+  phone         String
+  relationship  String
+  cpf           String        @id
+  dadosPessoais dadosPessoais @relation(fields: [cpf], references: [cpf])
+}
