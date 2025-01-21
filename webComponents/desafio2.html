@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nível intermediário</title>
+</head>
+
+<body>
+
+    <user-card img="https://avatars.githubusercontent.com/u/167131896?v=4" name="matheus" email="matheus@gmail.com" 
+    detail="teste">
+    </user-card>
+
+    <user-card></user-card>
+    
+
+    <hr>
+    <br>
+    <br>
+    <br>
+    <br>
+
+    
+
+    
+    <div>
+        <!-- Botão para abrir o modal -->
+        <button onclick="document.querySelector('custom-modal').open()">Abrir Modal</button>
+
+
+        <custom-modal>
+            <span slot="header">aaaa</span>
+            <p slot="body">teste.</p>
+            <button slot="footer" onclick="document.querySelector('custom-modal').close()">Fechar</button>
+        </custom-modal>
+    </div>
+
+
+    <hr>
+    <br>
+    <br>
+    <br>
+    <br>
+
+    <div>
+
+       
+
+        <data-table data='[{"name":"matheus", "idade": "24"},{"name":"teste", "idade": "30"}]' >
+            
+        </data-table>
+
+
+          
+          
+    </div>
+
+
+
+    <script type="module" src="/js/lib.js"></script>
+    <script src="js/data-table.js" ></script>
+
+</body>
+
+</html>
