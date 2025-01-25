@@ -30,8 +30,8 @@ export default function UserList() {
 
   const handleDeleteUser = async (id: number) => {
     try {
-      const response = await fetch(`/api/articles/${id}`, {
-        method: 'DELETE',
+      const response = await fetch(`http://localhost:4000/user/${id}`, {
+        method: 'Delete',
       });
 
       if (!response.ok) {
@@ -56,42 +56,44 @@ export default function UserList() {
   };
 
   return (
-    <div className="p-4 text-blue-600">
-      <h1 className="text-2xl font-bold mb-4">Lista de Usuários</h1>
-      <table className="table-auto w-full border-collapse border border-gray-300">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="border border-gray-300 px-4 py-2">id</th>
-            <th className="border border-gray-300 px-4 py-2">Nome</th>
-            <th className="border border-gray-300 px-4 py-2">Email</th>
-            <th className="border border-gray-300 px-4 py-2">Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map(user => (
-            <tr key={user.id}>
-              <td className="border border-gray-300 px-4 py-2">{user.id}</td>
-              <td className="border border-gray-300 px-4 py-2">{user.name}</td>
-              <td className="border border-gray-300 px-4 py-2">{user.email}</td>
-              <td className="border border-gray-300 px-4 py-2">
-                <button
-                  onClick={() => handleDeleteUser(user.id)}
-                  className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700 mr-2"
-                >
-                  Deletar
-                </button>
-                <a
-                  // href={`/users/${user.id}`}
-                  href={`/users/edit?id=${user.id}`}
-                  className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-700"
-                >
-                  Editar
-                </a>
-              </td>
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 text-black p-6">
+      <div className="w-full max-w-4xl bg-white p-8 rounded-2xl shadow-md">
+        <h1 className="text-2xl font-bold mb-6 text-gray-700">Lista de Usuários</h1>
+        
+        <table className="table-auto w-full border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="border border-gray-300 px-4 py-2 text-left">ID</th>
+              <th className="border border-gray-300 px-4 py-2 text-left">Nome</th>
+              <th className="border border-gray-300 px-4 py-2 text-left">Email</th>
+              <th className="border border-gray-300 px-4 py-2 text-left">Ações</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {users.map(user => (
+              <tr key={user.id} className="hover:bg-gray-100">
+                <td className="border border-gray-300 px-4 py-2">{user.id}</td>
+                <td className="border border-gray-300 px-4 py-2">{user.name}</td>
+                <td className="border border-gray-300 px-4 py-2">{user.email}</td>
+                <td className="border border-gray-300 px-4 py-2 flex space-x-2">
+                  <button
+                    onClick={() => handleDeleteUser(user.id)}
+                    className="bg-red-500 text-white px-3 py-2 rounded-lg hover:bg-red-700 transition"
+                  >
+                    Deletar
+                  </button>
+                  <a
+                    href={`/users/edit?id=${user.id}`}
+                    className="bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition"
+                  >
+                    Editar
+                  </a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

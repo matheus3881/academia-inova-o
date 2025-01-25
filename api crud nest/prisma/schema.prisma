@@ -13,9 +13,55 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model user {
-  id       Int    @id @default(autoincrement())
-  name     String
-  password String
-  email    String
+model personalData {
+  id              Int              @id @default(autoincrement())
+  name            String
+  dateOfBirth     DateTime
+  age             Int
+  gender          String
+  cpf             String           @unique
+  phone           String
+  email           String
+  nationality     String
+  maritalStatus   String
+  residentialData residentialData[] 
+  emergency       emergency[]
+  academicData    academicData[]
+}
+
+model residentialData {
+  id           Int          @id @default(autoincrement())
+  address      String
+  street       String
+  complement   String
+  neighborhood String
+  city         String
+  state        String
+  postalCode   String
+  country      String
+  personalId   Int          
+  personalData personalData @relation(fields: [personalId], references: [id], onDelete: Cascade)
+}
+
+model academicData {
+  id                 Int          @id @default(autoincrement())
+  registrationNumber String
+  course             String
+  yearOfEntry        Int
+  currentSemester    Int
+  academicStatus     String
+  gpa                Float?
+  educationMode      String
+  personalId         Int
+  personalData       personalData @relation(fields: [personalId], references: [id], onDelete: Cascade)
+}
+
+model emergency {
+  id           Int          @id @default(autoincrement())
+  name         String
+  relationship String
+  phone        String
+  email        String
+  personalId   Int
+  personalData personalData @relation(fields: [personalId], references: [id], onDelete: Cascade)
 }
