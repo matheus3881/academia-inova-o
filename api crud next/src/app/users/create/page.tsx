@@ -1,37 +1,73 @@
 'use client';
 
-import { redirect, useRouter } from 'next/navigation'
-import { title } from 'process';
-import { useState } from 'react';
+import { useRouter } from 'next/navigation'
+import React, { useEffect, useState } from 'react';
+import { date, string, z, ZodDate } from 'zod';
 
+const validSchema = z.object({
+  name:
+    z.string().min(2, "minimo 2 caracteres"),
+  dateOfBirth: z.date(),
+  age: z.number().min(18, "Minimo 18 anos").max(120, "ta morto ja"),
+  gender: z.enum(["male", "female", "other"]),
+  cpf: z.string().refine((cpf) => cpf.replace(/\D/g, '').length === 11, { message: "CPF deve ter 11 digitos", }),
+  phone: z.string().min(15, "xx (xx)-xxxxx-xxxx"),
+  email: z.string().email("deve conter @ e .com"),
+  nationality: z.string().min(3, "minimo 3 caracteres"),
+  maritalStatus: z.enum(["single", "married", "divorced", "widowed"])
 
+});
+
+type PersonalData = z.infer<typeof validSchema>;
 
 export default function CreateUser() {
   // dadosPessoais
-  const [name, setName] = useState('');
-  const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
-  const [age, setAge] = useState(0);
-  const [gender, setGender] = useState<'male' | 'female' | 'other'>('male');
-  const [cpf, setCpf] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [nationality, setNationality] = useState('');
-  const [maritalStatus, setMaritalStatus] = useState<'single' | 'married' | 'divorced' | 'widowed'>('single');
+  const [personalData, setPersonalData] = useState<PersonalData>({
+    name: "",
+    dateOfBirth: new Date(),
+    age: 0,
+    gender: "other",
+    cpf: "",
+    phone: "",
+    email: "",
+    nationality: "",
+    maritalStatus: "single"
+
+  })
 
   const route = useRouter();
+
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+
 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const result = validSchema.safeParse(personalData);
+
+    if (!result.success) {
+      const errorMessages: { [key: string]: string } = {};
+      result.error.errors.forEach((err) => {
+        errorMessages[err.path[0]] = err.message;
+      });
+      setErrors(errorMessages);
+      return;
+    }
+
+    setErrors({}); //se passou na validação, limpar os erros
+    console.log("Dados validados com sucesso!", personalData);
+
+
     try {
       const response = await fetch('http://localhost:4000/user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, dateOfBirth, age, gender, cpf, phone, email, nationality, maritalStatus }),
+        body: JSON.stringify(personalData),
       });
 
-      
+
       if (response.ok) {
         alert('Usuário criado com sucesso!');
         const data = await response.json(); // data = { id: 1 }
@@ -43,139 +79,153 @@ export default function CreateUser() {
     } catch (error) {
       console.error('Erro ao criar usuário:', error);
     }
-    
-   
+
+
+
   };
 
+  const handleChange = (e: any) => {
+    const { name, value } = e.target;
+    setPersonalData((prevData) => ({
+      ...prevData,
+      [name]: name === "dateOfBirth" ? new Date(value) :
+        name === "age" ? Number(value) : value, // Converte para número
+    }))
+  }
 
 
   return (
-    // Contêiner principal para centralizar o formulário na tela
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      {/* Caixa do formulário com fundo branco, bordas arredondadas e sombra */}
       <div className="w-full max-w-lg bg-white p-8 rounded-2xl shadow-md">
-        {/* Título do formulário */}
         <h1 className="text-2xl font-bold mb-6 text-gray-700">Criar Novo Usuário</h1>
-        {/* Início do formulário */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Campo para o nome */}
+
+          {/* Campo Nome */}
           <div>
             <label className="block text-gray-700 font-semibold mb-2">Nome</label>
             <input
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              name="name"
+              value={personalData.name}
+              onChange={handleChange}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
-              required
             />
+            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
           </div>
-  
-          {/* Campo para a data de nascimento */}
+
+          {/* Data de Nascimento */}
           <div>
             <label className="block text-gray-700 font-semibold mb-2">Data de Nascimento</label>
             <input
               type="date"
-              value={dateOfBirth ? dateOfBirth.toISOString().split('T')[0] : ''}
-              onChange={(e) => setDateOfBirth(new Date(e.target.value))}
+              name="dateOfBirth"
+              value={personalData.dateOfBirth.toISOString().split('T')[0]}
+              onChange={handleChange}
+
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
-              required
             />
+            {errors.dateOfBirth && <p className="text-red-500 text-sm mt-1">{errors.dateOfBirth}</p>}
           </div>
-  
-          {/* Campo para a idade */}
+
+          {/* Idade */}
           <div>
             <label className="block text-gray-700 font-semibold mb-2">Idade</label>
             <input
               type="number"
-              value={age}
-              onChange={(e) => setAge(Number(e.target.value))}
+              name="age"
+              value={personalData.age}
+              onChange={handleChange}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
-              required
             />
+            {errors.age && <p className="text-red-500 text-sm mt-1">{errors.age}</p>}
           </div>
-  
-          {/* Campo para o gênero */}
+
+          {/* Gênero */}
           <div>
             <label className="block text-gray-700 font-semibold mb-2">Gênero</label>
             <select
-              value={gender}
-              onChange={(e) => setGender(e.target.value as 'male' | 'female' | 'other')}
+              name="gender"
+              value={personalData.gender}
+              onChange={handleChange}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
-              required
             >
               <option value="male">Masculino</option>
               <option value="female">Feminino</option>
               <option value="other">Outro</option>
             </select>
+            {errors.gender && <p className="text-red-500 text-sm mt-1">{errors.gender}</p>}
           </div>
-  
-          {/* Campo para o CPF */}
+
+          {/* CPF */}
           <div>
             <label className="block text-gray-700 font-semibold mb-2">CPF</label>
             <input
               type="text"
-              value={cpf}
-              onChange={(e) => setCpf(e.target.value)}
+              name="cpf"
+              value={personalData.cpf}
+              onChange={handleChange}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
-              required
             />
+            {errors.cpf && <p className="text-red-500 text-sm mt-1">{errors.cpf}</p>}
           </div>
-  
-          {/* Campo para o telefone */}
+
+          {/* Telefone */}
           <div>
             <label className="block text-gray-700 font-semibold mb-2">Telefone</label>
             <input
               type="text"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              name="phone"
+              value={personalData.phone}
+              onChange={handleChange}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
-              required
             />
+            {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
           </div>
-  
-          {/* Campo para o e-mail */}
+
+          {/* E-mail */}
           <div>
             <label className="block text-gray-700 font-semibold mb-2">E-mail</label>
             <input
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              name="email"
+              value={personalData.email}
+              onChange={handleChange}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
-              required
             />
+            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
           </div>
-  
-          {/* Campo para a nacionalidade */}
+
+          {/* Nacionalidade */}
           <div>
             <label className="block text-gray-700 font-semibold mb-2">Nacionalidade</label>
             <input
               type="text"
-              value={nationality}
-              onChange={(e) => setNationality(e.target.value)}
+              name="nationality"
+              value={personalData.nationality}
+              onChange={handleChange}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
-              required
             />
+            {errors.nationality && <p className="text-red-500 text-sm mt-1">{errors.nationality}</p>}
           </div>
-  
-          {/* Campo para o estado civil */}
+
+          {/* Estado Civil */}
           <div>
             <label className="block text-gray-700 font-semibold mb-2">Estado Civil</label>
             <select
-              value={maritalStatus}
-              onChange={(e) =>
-                setMaritalStatus(e.target.value as 'single' | 'married' | 'divorced' | 'widowed')
-              }
+              name="maritalStatus"
+              value={personalData.maritalStatus}
+              onChange={handleChange}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
-              required
             >
               <option value="single">Solteiro(a)</option>
               <option value="married">Casado(a)</option>
               <option value="divorced">Divorciado(a)</option>
               <option value="widowed">Viúvo(a)</option>
             </select>
+            {errors.maritalStatus && <p className="text-red-500 text-sm mt-1">{errors.maritalStatus}</p>}
           </div>
-  
-          {/* Botão de envio do formulário */}
+
+          {/* Botão de Envio */}
           <button
             type="submit"
             className="w-full mt-6 p-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition"
@@ -186,6 +236,10 @@ export default function CreateUser() {
       </div>
     </div>
   );
-  
-  
+
+
 }
+function calculateAge(dateOfBirth: Date): number {
+  throw new Error('Function not implemented.');
+}
+
