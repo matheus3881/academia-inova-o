@@ -7,10 +7,10 @@ export default function AcademicData() {
   const [formData, setFormData] = useState({
     registrationNumber: "",
     course: "",
-    yearOfEntry: 0,
-    currentSemester: 0,
+    yearOfEntry: (0),
+    currentSemester: (0),
     academicStatus: "",
-    gpa: 0.0,
+    gpa: (0.0),
     educationMode: "",
   });
 
@@ -42,7 +42,7 @@ export default function AcademicData() {
 
     if (response.ok) {
       // Redirecionar para a próxima página (por exemplo, emergência)
-      router.push('create/nextStep'); // Substitua para o próximo passo do fluxo
+      router.push('emergency'); // Substitua para o próximo passo do fluxo
     } else {
       console.error("Erro ao salvar os dados acadêmicos");
     }
@@ -50,8 +50,13 @@ export default function AcademicData() {
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+     // Converte valores numéricos automaticamente
+  const numericFields = ["yearOfEntry", "currentSemester", "gpa"];
+  setFormData({
+    ...formData,
+    [name]: numericFields.includes(name) ? Number(value) : value,
+  });
+};
 
   return (
     // Contêiner principal para centralizar o formulário na tela

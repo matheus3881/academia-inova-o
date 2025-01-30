@@ -239,7 +239,5 @@ export default function CreateUser() {
 
 
 }
-function calculateAge(dateOfBirth: Date): number {
-  throw new Error('Function not implemented.');
-}
+
 
