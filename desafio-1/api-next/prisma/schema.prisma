@@ -7,67 +7,55 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Article {
-  id          Int      @id @default(autoincrement())
-  title       String   @unique
-  description String?
-  body        String
-  published   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model personalData {
+  id              Int              @id @default(autoincrement())
+  name            String
+  dateOfBirth     DateTime
+  age             Int
+  gender          String
+  cpf             String           @unique
+  phone           String
+  email           String
+  nationality     String
+  maritalStatus   String
+  residentialData residentialData[] 
+  emergency       emergency[]
+  academicData    academicData[]
 }
 
-model user {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model residentialData {
+  id           Int          @id @default(autoincrement())
+  address      String
+  street       String
+  complement   String
+  neighborhood String
+  city         String
+  state        String
+  postalCode   String
+  country      String
+  personalId   Int          
+  personalData personalData @relation(fields: [personalId], references: [id], onDelete: Cascade)
 }
 
-model dadosPessoais {
-  id                Int                @id @default(autoincrement())
-  name              String
-  dateOfBirth       DateTime
-  age               Int
-  gender            String
-  cpf               String              @unique
-  phone             String
-  email             String
-  nationality       String
-  maritalStatus     String
-  // dadosResidenciais dadosResidenciais?
-  // emergencia        emergencia?
-}
-
-model dadosResidenciais {
-  address       String
-  street        String
-  number        String
-  complement    String?
-  neighborhood  String
-  city          String
-  state         String
-  postalCode    String
-  country       String
-  cpf           String        @id
-  // dadosPessoais dadosPessoais @relation(fields: [cpf], references: [cpf])
-}
-
-model dadosAcademicos {
-  registrationNumber String @unique
+model academicData {
+  id                 Int          @id @default(autoincrement())
+  registrationNumber String
   course             String
   yearOfEntry        Int
   currentSemester    Int
   academicStatus     String
   gpa                Float?
   educationMode      String
+  personalId         Int
+  personalData       personalData @relation(fields: [personalId], references: [id], onDelete: Cascade)
 }
 
-model emergencia {
-  name          String
-  phone         String
-  relationship  String
-  cpf           String        @id
-  // dadosPessoais dadosPessoais @relation(fields: [cpf], references: [cpf])
+model emergency {
+  id           Int          @id @default(autoincrement())
+  name         String
+  relationship String
+  phone        String
+  email        String
+  personalId   Int
+  personalData personalData @relation(fields: [personalId], references: [id], onDelete: Cascade)
 }
