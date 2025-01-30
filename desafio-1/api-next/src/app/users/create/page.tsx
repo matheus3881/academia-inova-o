@@ -18,6 +18,7 @@ export default function CreateUser() {
   const [nationality, setNationality] = useState('');
   const [maritalStatus, setMaritalStatus] = useState<'single' | 'married' | 'divorced' | 'widowed'>('single');
 
+  const route = useRouter();
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,6 +40,7 @@ export default function CreateUser() {
         setCpf('');
         setAge(0);
         setDateOfBirth(null);
+        route.push('read');
       } else {
         alert('Erro ao criar usuário.');
       }

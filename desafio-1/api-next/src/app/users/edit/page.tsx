@@ -61,7 +61,7 @@ export default function EditUser() {
       }
 
       alert('Usuário atualizado com sucesso!');
-      router.push('/users/list'); // Redireciona para a lista de usuários
+      router.push('read'); // Redireciona para a lista de usuários
     } catch (error) {
       console.error(error);
       alert('Erro ao atualizar o usuário.');
