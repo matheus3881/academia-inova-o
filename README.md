@@ -1,75 +1,117 @@
-<H1>🧩 Repositório de Projetos de Desenvolvimento Web</H1>
+# 🚀 Academina da Inovação
 
 Bem-vindo ao meu repositório! Este espaço reúne projetos que desenvolvi para demonstrar e aprimorar minhas habilidades em desenvolvimento web, utilizando tecnologias modernas e seguindo boas práticas.
 Aqui você encontrará exemplos de APIs CRUD e o uso de Web Components para criação de interfaces reutilizáveis.
 
 </hr>
 
-<H2>🌟 Visão Geral</H2>
-Este repositório contém projetos organizados em três principais categorias:
+## 📂 Estrutura do Repositório
 
-<H2>APIs CRUD</H2>
-APIs construídas com Next.js e NestJS, integradas ao Prisma e conectadas ao banco de dados PostgreSQL. Estas APIs implementam funcionalidades essenciais para gerenciamento de dados, autenticação JWT e modularização.
+```plaintext
+📦 academia-inovacao
+├── 📁 desafio-1          # API CRUD com Next.js
+│   ├── 📁 src
+│   ├── 📄 package.json
+│   ├── 📄 README.md
+│   ├── 📄 .env.example
+│   ├── 📄 tsconfig.json
+│   └── 📄 prisma/schema.prisma
+├── 📁 desafio-2          # API CRUD com Next.js e NestJS
+│   ├── 📁 src
+│   ├── 📄 package.json
+│   ├── 📄 README.md
+│   ├── 📄 .env.example
+│   ├── 📄 tsconfig.json
+│   └── 📄 prisma/schema.prisma
+├── 📁 web-components     # Projeto Web Components
+│   ├── 📁 components
+│   ├── 📄 index.html
+│   ├── 📄 style.css
+│   ├── 📄 package.json
+│   ├── 📄 README.md
+│   └── 📄 server.js
+├── 📄 README.md
 
-<h2>Web Components</h2>
-Um conjunto de componentes customizados que seguem os padrões do W3C, permitindo o uso em diferentes aplicações e frameworks.
+```
 
-Os projetos refletem meu compromisso com a qualidade, a escalabilidade e a facilidade de uso no desenvolvimento de aplicações modernas.
+## 🏆 Desafios  
 
-</hr>
+### 🔹 Desafio 1 - **API CRUD com Next.js**  
+> Uma API RESTful construída com **Next.js** e **Prisma**, conectada a um banco de dados **PostgreSQL**.  
 
-<h2>🚀 Tecnologias Utilizadas<h2>
-Back-end:
+✅ CRUD completo (Create, Read, Update, Delete)  
+✅ Validação e tratamento de erros  
+⏳ Autenticação JWT  
 
-Next.js
-NestJS
-Prisma
-PostgreSQL
-Front-end:
+📌 **Tecnologias:** Next.js · Prisma · PostgreSQL · TypeScript  
 
-Web Components
-JavaScript/TypeScript
-HTML e CSS
-Outras Ferramentas:
+---
 
-Node.js
-JWT (para autenticação)
-Git/GitHub (para versionamento)
+### 🔹 Desafio 2 - **API CRUD com Next.js + NestJS**  
+> Um projeto que combina **Next.js** no front-end e **NestJS** no back-end, integrados via API RESTful.  
 
-</hr>
+✅ Arquitetura modular com NestJS  
+✅ Prisma ORM para modelagem e persistência  
+⏳ Proteção de rotas com autenticação JWT  
 
-<H2>📂 Estrutura do Repositório</H2>
-plaintext
-Copiar
-Editar
-├── api-crud-next/     # API CRUD com Next.js
-├── api-crud-nest/     # API CRUD com NestJS
-└── web-components/    # Projeto com Web Components
+📌 **Tecnologias:** Next.js · NestJS · Prisma · PostgreSQL · TypeScript  
 
-</hr>
+---
 
-<H2>🛠️ Como Utilizar os Projetos</H2>
-Cada projeto possui um arquivo README individual com as instruções detalhadas para instalação, configuração e execução.
-Para começar:
+### 🔹 Web Components  
+> Implementação de componentes customizados seguindo as especificações do **W3C** para interfaces reutilizáveis.  
 
-Clone este repositório:
+✅ Criação de componentes personalizados  
+✅ Facilidade de integração com diferentes frameworks  
+✅ Código modular e reutilizável  
 
-bash
-Copiar
-Editar
-git clone https://github.com/seu-usuario/nome-repositorio.git
-Navegue até a pasta do projeto desejado:
+📌 **Tecnologias:** Web Components · JavaScript · HTML · CSS  
 
-bash
-Copiar
-Editar
-cd nome-do-projeto
-Siga as instruções no README específico do projeto.
+---
 
-</hr>
+## 🛠️ Como Executar  
 
-<H2>🎯 Objetivos </H2>
-Demonstrar o uso de tecnologias modernas no desenvolvimento web.
-Explorar boas práticas de código e estruturação de projetos.
-Criar soluções escaláveis e reutilizáveis para diferentes cenários.
-Aprender e compartilhar conhecimento com a comunidade.
+1️⃣ **Clone este repositório**  
+```bash
+git clone https://github.com/seu-usuario/academia-inovacao.git
+```
+
+2️⃣ Entre no diretório do projeto desejado
+```bash
+cd desafio-1 # ou dc desafio-2 / cd webComponets
+```
+
+3️⃣ Instale as dependências
+```bash
+npm install
+```
+
+4️⃣ Configure o banco de dados (caso necessário)
+```bash
+cp .env.example .env  # Edite as variáveis conforme necessário
+```
+
+5️⃣ Execute a aplicação next.js
+```bash
+npm run dev
+```
+
+6️⃣ Execute a aplicação nest.js
+```bash
+npm run start
+```
+
+---
+
+# 🤝 Contribuições
+Contribuições são bem-vindas! Se tiver sugestões, correções ou melhorias:
+
+- Crie uma issue 📌
+- Faça um fork 🍴
+- Envie um pull request 🚀
+
+
+
+
+
+
