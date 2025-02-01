@@ -1,13 +1,13 @@
 // import { } from './../../../../node_modules/.prisma/client/index.d';
-import { Article, Prisma, dadosPessoais } from "@prisma/client";
+import { personalData } from "@prisma/client";
 import client from "@/lib/prisma/client";
 import { NextResponse } from "next/server";
 
 
 export async function POST(req: Request) {
   //  esta variavel newDadosPessoais é um objeto que vai receber os dados do body da requisição
-  const newDadosPessoais: dadosPessoais = await req.json();
-  const createdArticle = await client.dadosPessoais.create({
+  const newDadosPessoais: personalData = await req.json();
+  const createdArticle = await client.personalData.create({
     data: newDadosPessoais,
 
   });
@@ -23,8 +23,10 @@ export async function POST(req: Request) {
 
 
 
+
+
 export async function GET(req: Request) {
-  const dadosPessoais: dadosPessoais[] = await client.dadosPessoais.findMany();
+  const dadosPessoais: personalData[] = await client.personalData.findMany();
   return new NextResponse(JSON.stringify(dadosPessoais), {
     status: 200,
     statusText: "OK",

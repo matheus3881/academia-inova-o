@@ -1,5 +1,5 @@
 import client from "@/lib/prisma/client";
-import { dadosPessoais } from "@prisma/client";
+import { personalData } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { NextResponse, NextRequest } from "next/server";
 
@@ -11,7 +11,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 	const { id } = params;
   
 	try {
-	  const user = await client.dadosPessoais.findUnique({
+	  const user = await client.personalData.findUnique({
 		where: { id: parseInt(id) },
 	  });
   
@@ -29,10 +29,10 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 
 export async function PATCH(request: NextRequest, context: { params: FindById }) {
 	// const newArticleData: Article = await request.json();
-	const newDadosPessoais: dadosPessoais = await request.json();
+	const newDadosPessoais: personalData = await request.json();
 
 	try {
-		const updatedDadosPessoas: dadosPessoais = await client.dadosPessoais.update({
+		const updatedDadosPessoas: personalData = await client.personalData.update({
 			where: {
 				id: Number(context.params.id),
 			},
@@ -59,7 +59,7 @@ export async function DELETE(
 	context: { params: FindById }
 ) {
 	try {
-		await client.dadosPessoais.delete({
+		await client.personalData.delete({
 			where: {
 				id: Number(context.params.id),
 			},
