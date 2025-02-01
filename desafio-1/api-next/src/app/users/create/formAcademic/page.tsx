@@ -1,152 +1,175 @@
-"use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/router";
-import { resolve } from "path";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
+import { z } from "zod";
 
-const loginSchema = z.object({
-    email: z.string().email(),
-    password: z.string().min(8)
-});
 
-type FormData = z.infer<typeof loginSchema>;
+const schema = z.object({
+  registrationNumber: z.string(),
+  course: z.string().min(2, "digit um curso válido"),
+  yearOfEntry: z.number().int().min(1990, "Ano de entrada inválido").max(new Date().getFullYear(), "Ano de entrada não pode ser no futuro"),
+  currentSemester: z.number(),
+  academicStatus: z.string(),
+  gpa: z.number().optional(),
+  educationMode: z.string(),
+  });
 
-export default function LoginForm() {
+  type FormAcademic = z.infer<typeof schema>;
+
+
+  export default function FormAcademic() {
+
+    const router = useRouter();
 
     const {
-        handleSubmit,
-        register,
-        formState: {errors, isSubmitting, isDirty, isValid},
-    } = useForm<FormData>({
-        resolver: zodResolver(loginSchema),
+      register,
+      handleSubmit,
+      formState: {errors}
+    } = useForm<FormAcademic>({
+      resolver: zodResolver(schema),
     });
 
-    async function onSubmit(data:FormData) {
-        console.log(isSubmitting);
-        console.log(data);
 
-        await new Promise<void>((resolve) =>{
-            setTimeout(() => {
-                resolve();
-            }, 2000);
-        })
+    const onSubmit = async (data: FormAcademic) => {
+      const result = schema.safeParse(data)      
+        console.log(result);
+     
+        if(!result.success) {
+          console.log(result.error);
+          return;
+        }
+
+          try{
+            const response = await fetch('/api/academic', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data),
+            });
+
+            if(response.ok)  {
+              alert('Usuário criado com sucesso!');
+              router.push("formEmergency");
+            } else {
+              alert('Erro ao criar usuário.');
+            }
+            
+          } catch (error) {
+            console.error('Erro ao criar usuário:', error);
+          }
+        
     }
+
     return (
-        <div className="selection:bg-rose-500 selection:text-white">
-          <div className="flex min-h-screen items-center justify-center bg-rose-100">
-            <div className="flex-1 p-8">
-              <div className="mx-auto w-80 overflow-hidden rounded-3xl bg-white shadow-xl">
-                {/* Form Header */}
-                <div className="rounded-bl-4xl relative h-44 bg-rose-500">
-                  <svg
-                    className="absolute bottom-0"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 1440 320"
-                  >
-                    <path
-                      fill="#ffffff"
-                      fillOpacity="1"
-                      d="M0,64L48,80C96,96,192,128,288,128C384,128,480,96,576,85.3C672,75,768,85,864,122.7C960,160,1056,224,1152,245.3C1248,267,1344,245,1392,234.7L1440,224L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-                    ></path>
-                  </svg>
-                </div>
-    
-                {/* Form Body */}
-                <div className="rounded-tr-4xl bg-white px-10 pb-8 pt-4">
-                  <h1 className="text-2xl font-semibold text-gray-900">
-                    Welcome back!
-                  </h1>
-                  <form
-                    className="mt-12"
-                    action=""
-                    method="POST"
-                    onSubmit={handleSubmit(onSubmit)}
-                  >
-                    {/* Email Input */}
-                    <div className="relative">
-                      <input
-                        {...register("email", { required: true })}
-                        id="email"
-                        name="email"
-                        type="text"
-                        className="peer h-10 w-full border-b-2 border-gray-300 text-gray-900 placeholder-transparent focus:border-rose-600 focus:outline-none"
-                        placeholder="john@doe.com"
-                        autoComplete="off"
-                      />
-                      {errors?.email && (
-                        <p className="text-red-600 text-sm">
-                          {errors?.email?.message}
-                        </p>
-                      )}
-                      <label
-                        htmlFor="email"
-                        className="absolute -top-3.5 left-0 text-sm text-gray-600 transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-3.5 peer-focus:text-sm peer-focus:text-gray-600"
-                      >
-                        Email address
-                      </label>
-                    </div>
-    
-                    {/* Password Input */}
-                    <div className="relative mt-10">
-                      <input
-                        {...register("password", { required: true })}
-                        id="password"
-                        type="password"
-                        name="password"
-                        className="peer h-10 w-full border-b-2 border-gray-300 text-gray-900 placeholder-transparent focus:border-rose-600 focus:outline-none"
-                        placeholder="Password"
-                        autoComplete="off"
-                      />
-                      {errors?.password && (
-                        <p className="text-red-600 text-sm">
-                          {errors?.password?.message}
-                        </p>
-                      )}
-                      <label
-                        htmlFor="password"
-                        className="absolute -top-3.5 left-0 text-sm text-gray-600 transition-all peer-placeholder-shown:top-2 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-3.5 peer-focus:text-sm peer-focus:text-gray-600"
-                      >
-                        Password
-                      </label>
-                    </div>
-    
-                    {/* Submit Button */}
-                    <button
-                      type="submit"
-                      disabled={!isDirty || !isValid || isSubmitting}
-                      className="mt-20 block w-full cursor-pointer rounded bg-rose-500 px-4 py-2 text-center font-semibold text-white hover:bg-rose-400 focus:outline-none focus:ring focus:ring-rose-500 focus:ring-opacity-80 focus:ring-offset-2 disabled:opacity-70"
-                    >
-                      {isSubmitting ? (
-                        <div role="status">
-                          <svg
-                            aria-hidden="true"
-                            className="inline w-6 h-6 mr-2 text-white animate-spin fill-rose-600 opacity-100"
-                            viewBox="0 0 100 101"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            {/* SVG for Spinner Animation */}
-                          </svg>
-                        </div>
-                      ) : (
-                        "Sign In"
-                      )}
-                    </button>
-                  </form>
-    
-                  {/* Forgot Password Link */}
-                  <a
-                    href="#"
-                    className="mt-4 block text-center text-sm font-medium text-rose-600 hover:underline focus:outline-none focus:ring-2 focus:ring-rose-500"
-                  >
-                    Forgot your password?
-                  </a>
-                </div>
-              </div>
+      <div className="flex justify-center items-center min-h-screen bg-gray-100 p-6">
+        <form 
+          onSubmit={handleSubmit(onSubmit)} 
+          className="w-full max-w-md bg-white p-8 rounded-2xl shadow-md"
+        >
+          <h1 className="text-2xl font-bold text-gray-700 mb-6">Dados Acadêmicos</h1>
+  
+          <div className="space-y-4">
+            {/* Registration Number */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">
+                Número de Matrícula
+              </label>
+              <input
+                {...register("registrationNumber")}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
+              />
+              {errors.registrationNumber && (
+                <span className="text-red-500 text-sm">{errors.registrationNumber.message}</span>
+              )}
+            </div>
+  
+            {/* Course */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">
+                Curso
+              </label>
+              <input
+                {...register("course")}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
+              />
+              {errors.course && <span className="text-red-500 text-sm">{errors.course.message}</span>}
+            </div>
+  
+            {/* Year of Entry */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">
+                Ano de Entrada
+              </label>
+              <input
+                type="number"
+                {...register("yearOfEntry", { valueAsNumber: true })}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
+              />
+              {errors.yearOfEntry && <span className="text-red-500 text-sm">{errors.yearOfEntry.message}</span>}
+            </div>
+  
+            {/* Current Semester */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">
+                Semestre Atual
+              </label>
+              <input
+                type="number"
+                {...register("currentSemester", { valueAsNumber: true })}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
+              />
+              {errors.currentSemester && <span className="text-red-500 text-sm">{errors.currentSemester.message}</span>}
+            </div>
+  
+            {/* Academic Status */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">
+                Status Acadêmico
+              </label>
+              <input
+                {...register("academicStatus")}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
+              />
+              {errors.academicStatus && <span className="text-red-500 text-sm">{errors.academicStatus.message}</span>}
+            </div>
+  
+            {/* GPA */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">
+                Nota Média (GPA)
+              </label>
+              <input
+                type="number"
+                {...register("gpa", { valueAsNumber: true })}
+                step="0.01"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
+              />
+              {errors.gpa && <span className="text-red-500 text-sm">{errors.gpa.message}</span>}
+            </div>
+  
+            {/* Education Mode */}
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">
+                Modo de Ensino
+              </label>
+              <input
+                {...register("educationMode")}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
+              />
+              {errors.educationMode && <span className="text-red-500 text-sm">{errors.educationMode.message}</span>}
             </div>
           </div>
-        </div>
-      );
+  
+          {/* Submit button */}
+          <button 
+            type="submit"
+            className="w-full mt-6 p-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition"
+          >
+            Enviar
+          </button>
+        </form>
+      </div>
+    );
 
-}
+
+
+  }

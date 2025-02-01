@@ -2,6 +2,7 @@
 import { useForm } from "react-hook-form";
 import { number, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 
 
 const schema = z.object({
@@ -25,13 +26,36 @@ export default function MyForm() {
         resolver: zodResolver(schema),
         
     });
+
+    const router = useRouter();
+
     
-    const onSubmit = (data: FormData) => {
-        // console.log(data);
-        const {success, error} = schema.safeParse(data)      
-        console.log(error);
-        console.log("foi", success);
-        
+    // melhorar isso dps
+    const onSubmit = async (data: FormData) => {
+      const result = schema.safeParse(data);
+      console.log(result.success);
+  
+      if (!result.success) {
+        console.log(result.error);
+        return;
+      }
+  
+      try {
+        const response = await fetch('/api/residential', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+  
+        if (response.ok) {
+          alert('Usuário criado com sucesso!');
+          router.push("/formResidential");
+        } else {
+          alert('Erro ao criar usuário.');
+        }
+      } catch (error) {
+        console.error('Erro ao criar usuário:', error);
+      }
     };
 
     return (

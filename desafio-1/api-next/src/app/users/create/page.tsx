@@ -1,185 +1,173 @@
 'use client';
 
-import { redirect, useRouter } from 'next/navigation'
-import { title } from 'process';
-import { useState } from 'react';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
+const schema = z.object({
+  name: z.string().min(2, "Mínimo 2 caracteres"),
+  dateOfBirth: z.string().refine(
+    (date) => !isNaN(Date.parse(date)),
+    { message: "Data de nascimento inválida" }
+  ),
+  age: z.coerce.number().min(18, "Mínimo 18 anos").max(120, "Idade inválida"),
+  gender: z.enum(["male", "female", "other"], { message: "Selecione um gênero" }),
+  cpf: z.string().length(14, "CPF inválido"), // Formato com pontos e traço
+  phone: z.string().regex(/^\(\d{2}\) \d{4,5}-\d{4}$/, "Formato inválido (xx) xxxxx-xxxx"),
+  email: z.string().email("E-mail inválido"),
+  nationality: z.string().min(3, "Mínimo 3 caracteres"),
+  maritalStatus: z.enum(["single", "married", "divorced", "widowed"], { message: "Selecione um estado civil" }),
+});
 
+type PersonalData = z.infer<typeof schema>;
 
 export default function CreateUser() {
-  // dadosPessoais
-  const [name, setName] = useState('');
-  const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
-  const [age, setAge] = useState(0);
-  const [gender, setGender] = useState<'male' | 'female' | 'other'>('male');
-  const [cpf, setCpf] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [nationality, setNationality] = useState('');
-  const [maritalStatus, setMaritalStatus] = useState<'single' | 'married' | 'divorced' | 'widowed'>('single');
+  const { register, handleSubmit, formState: { errors } } = useForm<PersonalData>({
+    resolver: zodResolver(schema),
+  });
 
-  const route = useRouter();
+  const router = useRouter();
 
+  const onSubmit = async (data: PersonalData) => {
+    const result = schema.safeParse(data);
+    console.log(result.success);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    if (!result.success) {
+      console.log(result.error);
+      return;
+    }
 
     try {
       const response = await fetch('/api/articles', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, dateOfBirth, age, gender, cpf, phone, email, nationality, maritalStatus }),
+        body: JSON.stringify(data),
       });
 
-      
       if (response.ok) {
         alert('Usuário criado com sucesso!');
-        setName('');
-        setEmail('');
-        setPhone('');
-        setCpf('');
-        setAge(0);
-        setDateOfBirth(null);
-        route.push('read');
+        router.push("/formResidential");
       } else {
         alert('Erro ao criar usuário.');
       }
     } catch (error) {
       console.error('Erro ao criar usuário:', error);
     }
-    
-   
   };
 
-
-
   return (
-    <div className="p-4 ">
-      <h1 className="text-2xl font-bold mb-4">Criar Novo Usuário</h1>
-      <form onSubmit={handleSubmit}>
-        {/* name */}
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">name</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="border border-gray-300 p-2 w-full text-black"
-            required
-          />
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md bg-white p-8 rounded-2xl shadow-md">
+        <h1 className="text-2xl font-bold text-gray-700 mb-6">Cadastro Pessoal</h1>
+
+        <div className="space-y-4">
+          {/* Nome */}
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">Nome</label>
+            <input
+              type="text"
+              {...register("name")}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
+            />
+            {errors.name && <span className="text-red-500 text-sm">{errors.name.message}</span>}
+          </div>
+
+          {/* Data de Nascimento */}
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">Data de Nascimento</label>
+            <input
+              type="date"
+              {...register("dateOfBirth")}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
+            />
+            {errors.dateOfBirth && <span className="text-red-500 text-sm">{errors.dateOfBirth.message}</span>}
+          </div>
+
+          {/* Idade */}
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">Idade</label>
+            <input
+              type="number"
+              {...register("age", { valueAsNumber: true })}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
+            />
+            {errors.age && <span className="text-red-500 text-sm">{errors.age.message}</span>}
+          </div>
+
+          {/* Gênero */}
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">Gênero</label>
+            <select {...register("gender")} className="w-full p-3 border border-gray-300 rounded-lg">
+              <option value="">Selecione</option>
+              <option value="male">Masculino</option>
+              <option value="female">Feminino</option>
+              <option value="other">Outro</option>
+            </select>
+            {errors.gender && <span className="text-red-500 text-sm">{errors.gender.message}</span>}
+          </div>
+
+          {/* CPF */}
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">CPF</label>
+            <input
+              type="text"
+              placeholder="000.000.000-00"
+              {...register("cpf")}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
+            />
+            {errors.cpf && <span className="text-red-500 text-sm">{errors.cpf.message}</span>}
+          </div>
+
+          {/* Telefone */}
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">Telefone</label>
+            <input
+              type="text"
+              placeholder="(xx) xxxxx-xxxx"
+              {...register("phone")}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
+            />
+            {errors.phone && <span className="text-red-500 text-sm">{errors.phone.message}</span>}
+          </div>
+
+          {/* Email */}
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">E-mail</label>
+            <input
+              type="email"
+              {...register("email")}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
+            />
+            {errors.email && <span className="text-red-500 text-sm">{errors.email.message}</span>}
+          </div>
+
+          {/* Nacionalidade */}
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">Nacionalidade</label>
+            <input
+              type="text"
+              {...register("nationality")}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
+            />
+            {errors.nationality && <span className="text-red-500 text-sm">{errors.nationality.message}</span>}
+          </div>
+
+          {/* Estado Civil */}
+          <div>
+            <label className="block text-gray-700 font-medium mb-1">Estado Civil</label>
+            <select {...register("maritalStatus")} className="w-full p-3 border border-gray-300 rounded-lg">
+              <option value="">Selecione</option>
+              <option value="single">Solteiro(a)</option>
+              <option value="married">Casado(a)</option>
+              <option value="divorced">Divorciado(a)</option>
+              <option value="widowed">Viúvo(a)</option>
+            </select>
+          </div>
         </div>
 
-        {/* dateOfBirth */}
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">date of birth</label>
-          <input
-            type="date"
-            value={dateOfBirth ? dateOfBirth.toISOString().split('T')[0] : ''}
-            onChange={(e) => setDateOfBirth(new Date(e.target.value))}
-            className="border border-gray-300 p-2 w-full text-black"
-            required
-          />
-        </div>
-
-        {/* age */}
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">age</label>
-          <input
-            type="number"
-            value={age}
-            onChange={(e) => setAge(Number(e.target.value))}
-            className="border border-gray-300 p-2 w-full text-black"
-            required
-          />
-        </div>
-
-        {/*gender */}
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">gender</label>
-          <select
-            value={gender}
-            onChange={(e) => setGender(e.target.value as 'male' | 'female' | 'other')}
-            className="border border-gray-300 p-2 w-full text-black"
-            required
-          >
-            <option value="male">male</option>
-            <option value="female">female</option>
-            <option value="other">other</option>
-          </select>
-        </div>
-
-        {/* cpf */}
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">cpf</label>
-          <input
-            type="text"
-            value={cpf}
-            onChange={(e) => setCpf(e.target.value)}
-            className="border border-gray-300 p-2 w-full text-black"
-            required
-          />
-        </div>
-
-        {/* phone */}
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">phone</label>
-          <input
-            type="text"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="border border-gray-300 p-2 w-full text-black"
-            required
-          />
-        </div>
-
-
-        {/* email */}
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="border border-gray-300 p-2 w-full text-black"
-            required
-          />
-        </div>
-
-        {/*nationality */}
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">nationality</label>
-          <input
-            type="text"
-            value={nationality}
-            onChange={(e) => setNationality(e.target.value)}
-            className="border border-gray-300 p-2 w-full text-black"
-            required
-          />
-        </div>
-
-        {/* maritalStatus */}
-        <div className="mb-4">
-          <label className="block text-gray-700 mb-2">maritalStatus</label>
-          <select
-            value={maritalStatus}
-            onChange={(e) => setMaritalStatus(e.target.value as 'single' | 'married' | 'divorced' | 'widowed')}
-            className="border border-gray-300 p-2 w-full text-black"
-            required
-          >
-            <option value="single">single</option>
-            <option value="married">married</option>
-            <option value="divorced">divorced</option>
-            <option value="widowed">widowed</option>
-          </select>
-        </div>
-
-
-
-        <button
-          type="submit"
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700"
-        >
-          Criar Usuário
+        <button type="submit" className="w-full mt-6 p-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition">
+          Enviar
         </button>
       </form>
     </div>
