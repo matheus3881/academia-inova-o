@@ -5,14 +5,18 @@ import { NextResponse } from "next/server";
 
 
 export async function POST(req: Request) {
+ 
   //  esta variavel newDadosPessoais é um objeto que vai receber os dados do body da requisição
   const newDadosPessoais: personalData = await req.json();
+  console.log("Dados recebidos:", req.body);
   const createdArticle = await client.personalData.create({
     data: newDadosPessoais,
+    
 
-  });
+  }
+);
 
-
+console.log("Usuário criado:", createdArticle); // Log do usuário criado
 
   return new NextResponse(JSON.stringify(createdArticle), {
     status: 201,

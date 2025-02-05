@@ -7,10 +7,7 @@ import { z } from "zod";
 
 const schema = z.object({
   name: z.string().min(2, "Mínimo 2 caracteres"),
-  dateOfBirth: z.string().refine(
-    (date) => !isNaN(Date.parse(date)),
-    { message: "Data de nascimento inválida" }
-  ),
+  dateOfBirth: z.coerce.date(),
   age: z.coerce.number().min(18, "Mínimo 18 anos").max(120, "Idade inválida"),
   gender: z.enum(["male", "female", "other"], { message: "Selecione um gênero" }),
   cpf: z.string().length(14, "CPF inválido"), // Formato com pontos e traço
@@ -30,8 +27,18 @@ export default function CreateUser() {
   const router = useRouter();
 
   const onSubmit = async (data: PersonalData) => {
+    // Formatar a data para o formato aceito pelo Prisma (YYYY-MM-DDT00:00:00.000Z)
+  // const formattedData = {
+  //   ...data,
+  //   dateOfBirth: data.dateOfBirth
+  //     ? new Date(data.dateOfBirth).toISOString().split("T")[0] + "T00:00:00.000Z"
+  //     : null // Se não houver data, mantém null
+  // }
+
     const result = schema.safeParse(data);
     console.log(result.success);
+    // console.log(result);
+  console.log("teste", data);
 
     if (!result.success) {
       console.log(result.error);
@@ -77,7 +84,7 @@ export default function CreateUser() {
           <div>
             <label className="block text-gray-700 font-medium mb-1">Data de Nascimento</label>
             <input
-              type="date"
+             type="date"
               {...register("dateOfBirth")}
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-black"
             />
